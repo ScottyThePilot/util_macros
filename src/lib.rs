@@ -82,7 +82,7 @@ macro_rules! mutex {
 /// 
 /// Note: only supports generic lifetimes.
 #[macro_export]
-macro_rules! union_enum {
+macro_rules! error_enum {
   {
     $v:vis enum $Enum:ident
     $(<$($lt:lifetime),+ $(,)?>)?
@@ -92,21 +92,28 @@ macro_rules! union_enum {
       $($Variant($type)),+
     }
 
-    $crate::union_enum_impl!($Enum$(<$($lt),+>)? { $($Variant($type)),+ });
+    impl$(<$($lt),+>)? std::fmt::Debug for $Enum$(<$($lt),+>)? {
+      fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+          $(Self::$Variant(t) => t.fmt(f),)+
+        }
+      }
+    }
+
+    $crate::error_enum_impl!($Enum$(<$($lt),+>)? { $($Variant($type)),+ });
   };
-  
 }
 
 #[doc(hidden)]
 #[macro_export]
-macro_rules! union_enum_impl {
+macro_rules! error_enum_impl {
   (
     $Enum:ident
     $(<$($lt:lifetime),+ $(,)?>)?
     { $Variant:ident($type:ty), $($VRest:ident($trest:ty)),+ }
   ) => {
-    $crate::union_enum_impl!($Enum$(<$($lt),+>)? { $Variant($type) });
-    $crate::union_enum_impl!($Enum$(<$($lt),+>)? { $($VRest($trest)),+});
+    $crate::error_enum_impl!($Enum$(<$($lt),+>)? { $Variant($type) });
+    $crate::error_enum_impl!($Enum$(<$($lt),+>)? { $($VRest($trest)),+});
   };
   (
     $Enum:ident
