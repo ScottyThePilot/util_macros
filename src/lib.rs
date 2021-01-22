@@ -127,3 +127,35 @@ macro_rules! error_enum_impl {
     }
   };
 }
+
+/// Allows you to have optional macro variables default to something.
+/// Useful in the creation of macros.
+#[macro_export]
+macro_rules! macro_default {
+  (@item, $d:item, $o:item) => ($o);
+  (@item, $d:item $(,)?) => ($d);
+  (@block, $d:block, $o:block) => ($o);
+  (@block, $d:block $(,)?) => ($d);
+  (@stmt, $d:stmt, $o:stmt) => ($o);
+  (@stmt, $d:stmt $(,)?) => ($d);
+  (@pat, $d:pat, $o:pat) => ($o);
+  (@pat, $d:pat $(,)?) => ($d);
+  (@expr, $d:expr, $o:expr) => ($o);
+  (@expr, $d:expr $(,)?) => ($d);
+  (@ty, $d:ty, $o:ty) => ($o);
+  (@ty, $d:ty $(,)?) => ($d);
+  (@ident, $d:ident, $o:ident) => ($o);
+  (@ident, $d:ident $(,)?) => ($d);
+  (@path, $d:path, $o:path) => ($o);
+  (@path, $d:path $(,)?) => ($d);
+  (@tt, $d:tt, $o:tt) => ($o);
+  (@tt, $d:tt $(,)?) => ($d);
+  (@meta, $d:meta, $o:meta) => ($o);
+  (@meta, $d:meta $(,)?) => ($d);
+  (@lifetime, $d:lifetime, $o:lifetime) => ($o);
+  (@lifetime, $d:lifetime $(,)?) => ($d);
+  (@vis, $d:vis, $o:vis) => ($o);
+  (@vis, $d:vis $(,)?) => ($d);
+  (@literal, $d:literal, $o:literal) => ($o);
+  (@literal, $d:literal $(,)?) => ($d);
+}
