@@ -50,12 +50,12 @@ macro_rules! hash_set {
 macro_rules! rwlock {
   ($state:expr) => (::std::sync::RwLock::read(&$state).unwrap());
   (mut $state:expr) => (::std::sync::RwLock::write(&$state).unwrap());
-  ($state:expr, |$var:ident| $action:block) => ({
+  ($state:expr, |$var:ident| $action:expr) => ({
     let $var = $crate::rwlock!($state);
     let __out__ = $action;
     drop($var); __out__
   });
-  (mut $state:expr, |$var:ident| $action:block) => ({
+  (mut $state:expr, |$var:ident| $action:expr) => ({
     let mut $var = $crate::rwlock!(mut $state);
     let __out__ = $action;
     drop($var); __out__
@@ -66,7 +66,7 @@ macro_rules! rwlock {
 #[macro_export]
 macro_rules! mutex {
   ($state:expr) => (::std::sync::Mutex::lock(&$state).unwrap());
-  ($state:expr, |$var:ident| $action:block) => ({
+  ($state:expr, |$var:ident| $action:expr) => ({
     let mut $var = $crate::mutex!($state);
     let __out__ = $action;
     drop($var); __out__
