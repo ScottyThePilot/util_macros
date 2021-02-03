@@ -50,8 +50,6 @@ macro_rules! hash_set {
 macro_rules! rwlock {
   ($state:expr) => ($state.read().unwrap());
   (mut $state:expr) => ($state.write().unwrap());
-  (async $state:expr) => ($state.read().unwrap().await);
-  (async mut $state:expr) => ($state.write().unwrap().await);
   ($state:expr, |$var:ident| $action:expr) => ({
     let $var = $crate::rwlock!($state);
     let __out__ = $action;
@@ -62,13 +60,13 @@ macro_rules! rwlock {
     let __out__ = $action;
     drop($var); __out__
   });
-  (async $state:expr, |$var:ident| $action:expr) => ({
-    let $var = $crate::rwlock!(async $state);
+  ($state:expr, async |$var:ident| $action:expr) => (async {
+    let $var = $crate::rwlock!($state).await;
     let __out__ = $action;
     drop($var); __out__
   });
-  (async mut $state:expr, |$var:ident| $action:expr) => ({
-    let mut $var = $crate::rwlock!(async mut $state);
+  (mut $state:expr, async |$var:ident| $action:expr) => (async {
+    let mut $var = $crate::rwlock!(mut $state).await;
     let __out__ = $action;
     drop($var); __out__
   });
@@ -78,14 +76,13 @@ macro_rules! rwlock {
 #[macro_export]
 macro_rules! mutex {
   ($state:expr) => ($state.lock().unwrap());
-  (async $state:expr) => ($state.lock().unwrap().await);
   ($state:expr, |$var:ident| $action:expr) => ({
     let mut $var = $crate::mutex!($state);
     let __out__ = $action;
     drop($var); __out__
   });
-  (async $state:expr, |$var:ident| $action:expr) => ({
-    let mut $var = $crate::mutex!(async $state);
+  ($state:expr, async |$var:ident| $action:expr) => (async {
+    let mut $var = $crate::mutex!($state).await;
     let __out__ = $action;
     drop($var); __out__
   });
