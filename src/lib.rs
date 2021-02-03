@@ -48,8 +48,10 @@ macro_rules! hash_set {
 /// Abstracts away the process of accessing or mutating an `RwLock`.
 #[macro_export]
 macro_rules! rwlock {
-  ($state:expr) => (::std::sync::RwLock::read(&$state).unwrap());
-  (mut $state:expr) => (::std::sync::RwLock::write(&$state).unwrap());
+  ($state:expr) => ($state.read().unwrap());
+  (mut $state:expr) => ($state.write().unwrap());
+  (async $state:expr) => ($state.read().unwrap().await);
+  (async mut $state:expr) => ($state.write().unwrap().await);
   ($state:expr, |$var:ident| $action:expr) => ({
     let $var = $crate::rwlock!($state);
     let __out__ = $action;
@@ -60,14 +62,30 @@ macro_rules! rwlock {
     let __out__ = $action;
     drop($var); __out__
   });
+  (async $state:expr, |$var:ident| $action:expr) => ({
+    let $var = $crate::rwlock!(async $state);
+    let __out__ = $action;
+    drop($var); __out__
+  });
+  (async mut $state:expr, |$var:ident| $action:expr) => ({
+    let mut $var = $crate::rwlock!(async mut $state);
+    let __out__ = $action;
+    drop($var); __out__
+  });
 }
 
 /// Abstracts away the process of accessing or mutating a `Mutex`.
 #[macro_export]
 macro_rules! mutex {
-  ($state:expr) => (::std::sync::Mutex::lock(&$state).unwrap());
+  ($state:expr) => ($state.lock().unwrap());
+  (async $state:expr) => ($state.lock().unwrap().await);
   ($state:expr, |$var:ident| $action:expr) => ({
     let mut $var = $crate::mutex!($state);
+    let __out__ = $action;
+    drop($var); __out__
+  });
+  (async $state:expr, |$var:ident| $action:expr) => ({
+    let mut $var = $crate::mutex!(async $state);
     let __out__ = $action;
     drop($var); __out__
   });
