@@ -143,6 +143,33 @@ macro_rules! error_enum_impl {
   };
 }
 
+#[cfg(feature = "conditions")]
+#[macro_export]
+/// Returns true if every expression within evaluates to true
+macro_rules! all {
+  ($item0:expr, $($items:expr),+ $(,)?) => (
+    ($item0) $(&& ($items))+
+  );
+}
+
+#[cfg(feature = "conditions")]
+#[macro_export]
+/// Returns true if at least one expression within evaluates to true
+macro_rules! any {
+  ($item0:expr, $($items:expr),+ $(,)?) => (
+    ($item0) $(|| ($items))+
+  );
+}
+
+#[cfg(feature = "conditions")]
+#[macro_export]
+/// Returns true if the expression within evaluates to false
+macro_rules! not {
+  ($item:expr) => {
+    !($item)
+  };
+}
+
 /// Allows you to have optional macro variables default to something.
 /// Useful in the creation of macros.
 #[macro_export]
