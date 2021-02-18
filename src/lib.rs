@@ -201,3 +201,15 @@ macro_rules! macro_default {
   (@literal, $d:literal, $o:literal) => ($o);
   (@literal, $d:literal $(,)?) => ($d);
 }
+
+/// Similar to the `try!` macro in std, but `continue`s on a `None`
+/// option rather than returning.
+#[macro_export] 
+macro_rules! try_continue {
+  ($expr:expr $(,)?) => {
+    match $expr {
+      Option::Some(val) => val,
+      Option::None => continue
+    }
+  };
+}
