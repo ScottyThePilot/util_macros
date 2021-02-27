@@ -90,6 +90,7 @@ macro_rules! mutex {
 
 /// Creates an enum who's variants all contain one item each, and implements `From`
 /// for the enum such that each variant can be converted from the type they contain.
+/// Enums created with this macro implement `Debug`, `Display` and `Error`.
 /// 
 /// This is useful for error enum types where you need to be able to return multiple
 /// errors and the try syntax (`?`) can be used to convert other errors into your custom
@@ -103,17 +104,12 @@ macro_rules! error_enum {
     $(<$($lt:lifetime),+ $(,)?>)?
     { $($Variant:ident($type:ty)),+ $(,)? }
   } => {
+    #[derive(Debug, Display)]
     $v enum $Enum$(<$($lt),+>)? {
       $($Variant($type)),+
     }
 
-    impl$(<$($lt),+>)? std::fmt::Debug for $Enum$(<$($lt),+>)? {
-      fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-          $(Self::$Variant(t) => t.fmt(f),)+
-        }
-      }
-    }
+    impl ::std::error::Error for $Enum$(<$($lt),+>)? {}
 
     $crate::error_enum_impl!($Enum$(<$($lt),+>)? { $($Variant($type)),+ });
   };
