@@ -104,9 +104,17 @@ macro_rules! error_enum {
     $(<$($lt:lifetime),+ $(,)?>)?
     { $($Variant:ident($type:ty)),+ $(,)? }
   } => {
-    #[derive(Debug, Display)]
+    #[derive(Debug)]
     $v enum $Enum$(<$($lt),+>)? {
       $($Variant($type)),+
+    }
+
+    impl$(<$($lt),+>)? std::fmt::Display for $Enum$(<$($lt),+>)? {
+      fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+          $(Self::$Variant(t) => t.fmt(f),)+
+        }
+      }
     }
 
     impl ::std::error::Error for $Enum$(<$($lt),+>)? {}
